@@ -171,7 +171,7 @@ export class gamePlay extends Component {
         console.log( " launch ball " ) ;
         const ballRigidbody = this.ballImage.getComponent(RigidBody2D);
         console.log( " launch rigidball " ,ballRigidbody )
-        ballRigidbody.applyLinearImpulseToCenter( new Vec2(10 , 200) , true) ;
+        ballRigidbody.applyLinearImpulseToCenter( new Vec2(10 , 20) , true) ;
     }
 
     onBeginContact(contact: any, selfCollider: any, otherCollider: any) 
@@ -181,26 +181,26 @@ export class gamePlay extends Component {
 
         if (selfCollider.node === this.bottomWall) 
         {
-            // let length = this.extraBalls.children.length;
-            // this.extraBalls.children[this.remainingBalls-1].destroy();
-            // this.remainingBalls--;
-            // if (this.remainingBalls == 0) {
-            //     console.log("game over");
-            //     director.loadScene(gamePlayScene);
-            //     return;
-            // }
+            let length = this.extraBalls.children.length;
+            this.extraBalls.children[this.remainingBalls-1].destroy();
+            this.remainingBalls--;
+            if (this.remainingBalls == 0) {
+                console.log("game over");
+                director.loadScene(gamePlayScene);
+                return;
+            }
             this.changeBallColor() ;
-            // ballRigidbody.sleep() ;
+            ballRigidbody.sleep() ;
 
-            // if( ballRigidbody ) ballRigidbody.destroy() ;
-            // this.ballImage.setPosition(this.ballInitialPosition) ;
-            // console.log("pos => ",this.ballInitialPosition , this.ballImage.position , this.ballImage.getPosition() )
-            // this.platformBase.setPosition( this.platformInitialPosition ) ;
-            // let rig = this.ballImage.getComponent(RigidBody2D);
-            // if( rig ) console.log( " avaidjcsk " ) ;
+            if( ballRigidbody ) ballRigidbody.destroy() ;
+            this.ballImage.setPosition(this.ballInitialPosition) ;
+            console.log("pos => ",this.ballInitialPosition , this.ballImage.position , this.ballImage.getPosition() )
+            this.platformBase.setPosition( this.platformInitialPosition ) ;
+            let rig = this.ballImage.getComponent(RigidBody2D);
+            if( rig ) console.log( " avaidjcsk " ) ;
 
-            // this.isAnimating = true ; 
-            // this.timerAnimation(3);
+            this.isAnimating = true ; 
+            this.timerAnimation(3);
         }
         else if (selfCollider.node.parent.parent === this.allBricks  )    
         {
