@@ -1,7 +1,7 @@
 [
   {
     "__type__": "cc.Prefab",
-    "_name": "winPrefab",
+    "_name": "popUpGamePlayScenePrefab",
     "_objFlags": 0,
     "_native": "",
     "data": {
@@ -12,7 +12,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "winPrefab",
+    "_name": "popUpGamePlayScenePrefab",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": null,
@@ -203,7 +203,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "winningLabel",
+    "_name": "popUpLabelText",
     "_objFlags": 0,
     "_parent": {
       "__id__": 1
@@ -336,7 +336,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "playNextGame",
+    "_name": "playGame",
     "_objFlags": 0,
     "_parent": {
       "__id__": 1
@@ -452,7 +452,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 150,
+      "width": 180,
       "height": 40
     },
     "_anchorPoint": {
@@ -487,7 +487,7 @@
       "b": 0,
       "a": 255
     },
-    "_string": "Play Next",
+    "_string": "Play Game",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
     "_actualFontSize": 30,
@@ -536,7 +536,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 150,
+      "width": 180,
       "height": 40
     },
     "_anchorPoint": {

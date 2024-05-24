@@ -23,7 +23,7 @@ export class levelSelection extends Component {
 
     clickLevels( event: Event, customEventData: string )
     {
-        console.log( " clikced levels " , customEventData )
+        // console.log( " clikced levels " , customEventData )
         Singleton.getInstance().clickLevel = parseInt(customEventData) ;
         director.loadScene(gamePlayScene) ;
     }
@@ -54,18 +54,18 @@ export class levelSelection extends Component {
         this.usernameID.string = Singleton.getInstance().username ;
         this.gameModeIndex = Singleton.getInstance().gameMode ;
 
-        console.log('game mde ' ,  this.gameModeIndex  ) ;
+        // console.log('game mde ' ,  this.gameModeIndex  ) ;
         Singleton.getInstance().totalLevel = this.allLevels.children.length ;
         let totalLevels = this.allLevels.children.length ;
         // for(let i=0; i<5 ; i++)
         // {
         //     let prevLevel = Singleton.getInstance().getLevelScore(this.gameModeIndex , i ) ;  
-        //     console.log( ' level  prevlevel ' , prevLevel  ) ;
+        //    console.log( ' level  prevlevel ' , prevLevel  ) ;
         // }
         for(let i=1; i<totalLevels ; i++)
         {
             let prevLevel = Singleton.getInstance().getLevelScore(this.gameModeIndex , i-1 ) ;  
-            console.log( ' level-prevlevel   ' , prevLevel , "game mode " , this.gameModeIndex ) ;
+            // console.log( ' level-prevlevel   ' , prevLevel , "game mode " , this.gameModeIndex ) ;
             this.openLevel( i , prevLevel > 0 ? true : false )  ;
         }
     }

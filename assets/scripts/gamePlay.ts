@@ -1,5 +1,5 @@
 import { _decorator, AudioSource, BoxCollider2D, Button, Collider2D, Color, Component, Contact2DType, director, EventMouse, instantiate, Intersection2D, Label, Layout, Node, PhysicsSystem2D, Prefab, randomRangeInt, RigidBody2D, sp, Sprite, tween, Tween, UITransform, Vec2, Vec3 } from 'cc';
-import { gamePlayScene , levelSelectionScene , countdownLabelFontSize, gameModeSelectionScene , winningLabel , playNextGame } from './constants' ;
+import { gamePlayScene , levelSelectionScene , letstartGameFontSize , countdownLabelFontSize, gameModeSelectionScene , popUpLabel , playGameButton } from './constants' ;
 import { Singleton } from './gameManager/singleton';
 import { brickPatternDesigns } from './bricksPatterns';
 import { switchButton } from './Utility';
@@ -43,6 +43,10 @@ export class gamePlay extends Component {
     @property({ type: Prefab })
     extraBallsPrefab: Prefab | null = null;
 
+
+
+    @property({ type: Label })
+    letsStartGame: Label | null = null;
     @property({ type: Label })
     countdownLabel: Label | null = null;
 
@@ -51,7 +55,7 @@ export class gamePlay extends Component {
     @property({ type: Label })
     playerScore: Label | null = null;
     @property({ type: Prefab })
-    winPrefab: Prefab | null = null;
+    popUpGamePlayScenePrefab: Prefab | null = null;
 
 
     @property({ type: Node })
@@ -59,6 +63,9 @@ export class gamePlay extends Component {
     @property({ type: Node })
     play_icon: Node | null = null;
 
+
+    @property({ type: Node })
+    bgSettingImage: Node | null = null;
     @property({ type: Node })
     settingsImgButtom: Node | null = null;
     @property({ type: Node })
@@ -66,7 +73,9 @@ export class gamePlay extends Component {
     @property({ type: Node })
     OnAudio_icon: Node | null = null;
 
-
+    private rows : number ;
+    private columns : number ;
+    private isBrickAnimating : boolean = true ;
     private ballInitialPosition : Vec3 = new Vec3(0,0,0) ;
     private platformInitialPosition : Vec3 = new Vec3(0,0,0) ;
     private remainingBalls : number = 0 ;
@@ -85,16 +94,19 @@ export class gamePlay extends Component {
     private isSettingOpens: boolean = true;
     private totalLevels : number = 0 ;
     private nextGame : string ;
-
     private startFirstTime : number = 1 ;
+    private startGameAnimationFlag : number = 1 ;
     
 
 
     startGameButton()
     {
+        if( this.isBrickAnimating ) return ;
+        if( this.letsStartGame ) this.letsStartGame.destroy() ;
+        if( this.isSettingOpens ) return ;
         switchButton(this.play_icon, this.pause_icon, !this.play_icon.active);
-        if( this.startFirstTime  ) this.startFirstTime = 0 , this.timerAnimation( 3 ) ;
-        if( this.play_icon.active ) director.pause() ;
+        if( this.startFirstTime  ) this.startFirstTime = 0 , this.countdownTimerAnimation( 3 ) ;
+        if( this.play_icon.active )  director.pause() ;
         else  director.resume() ;
         
     }
@@ -105,9 +117,7 @@ export class gamePlay extends Component {
         let settingLayout = this.settingsImgButtom.getComponent(Layout);
         if ( this.isSettingOpens) 
         {
-            this.scheduleOnce( () => {
-                director.pause() ;
-            } , 0 )
+            this.bgSettingImage.active = true ;
             settingLayout.type = Layout.Type.VERTICAL;
             settingLayout.verticalDirection = Layout.VerticalDirection.TOP_TO_BOTTOM;
             let spacing = 10;
@@ -116,27 +126,30 @@ export class gamePlay extends Component {
             this.settingsImgButtom.children.forEach((child, index) => {
                 child.active = true;
             });
-            
+            settingLayout.updateLayout();
+            director.pause() ;
         }
         else 
         {
-            director.resume();
+            this.bgSettingImage.active = false ;
             settingLayout.type = Layout.Type.NONE;
             this.settingsImgButtom.children.forEach((child) => {
                 child.setPosition(new Vec3(0, 0, 0));
                 child.active = false;
             });
+            settingLayout.updateLayout();
+            director.resume();
         }
     } 
     restartGame()
     {
-        console.log("restart Game To levelSelectionScene");
+        // console.log("restart Game To levelSelectionScene");
         Tween.stopAll();
         director.loadScene(levelSelectionScene);
     }
     exitGame()
     {
-        console.log("exit screen gameModeSelectionScene ");
+        // console.log("exit screen gameModeSelectionScene ");
         Tween.stopAll();
         director.loadScene(gameModeSelectionScene);
     }
@@ -148,14 +161,13 @@ export class gamePlay extends Component {
     }
 
 
-
- 
-    
-
     start() 
     {
-        console.log("start start start function");
-        this.play_icon.active = true ;
+        // console.log("start start start function");
+        const startGameLabel = this.letsStartGame.getComponent(Label);
+        startGameLabel.fontSize = 0 ; 
+
+        this.play_icon.active = false ;
         this.pause_icon.active = false ;
         this.settingsButtom()  ;
         this.bgMusic.play() ;
@@ -164,7 +176,7 @@ export class gamePlay extends Component {
         if( Singleton.getInstance().totalLives ) this.totalLives = Singleton.getInstance().totalLives ;
         if( Singleton.getInstance().clickLevel ) this.clickedLevel = Singleton.getInstance().clickLevel ;
         if( Singleton.getInstance().totalLevel  ) this.totalLevels = Singleton.getInstance().totalLevel  ;
-        console.log( "game mode  " , this.gameMode , "total lives " , this.totalLives ) ;
+        // console.log( "game mode  " , this.gameMode , "total lives " , this.totalLives ) ;
         for(let i=0; i<this.totalLives; i++)
         {
             this.extraBalls.addChild(instantiate(this.extraBallsPrefab)) ;
@@ -207,49 +219,156 @@ export class gamePlay extends Component {
         this.platformBase.setPosition( newPositionPlatformBase  ) ;
     }
 
+
     generateBricksPattern()
     {
-        console.log( "brick pattern function "  )
+        // console.log( "brick pattern function "  )
         // let totalPatternDesigns = brickPatternDesigns.length  ;
         // let selectRandomPattern = randomRangeInt(0 , totalPatternDesigns ) ;
         // console.log( " random index " , selectRandomPattern ) ;
         // let brickMatrix = brickPatternDesigns[selectRandomPattern] ;
         let brickMatrix = brickPatternDesigns[this.clickedLevel] ;
-        let row = brickMatrix.length ;
+        this.rows = brickMatrix.length ;
         let randomNumber = randomRangeInt(0 , this.allColors.length)
-        for (let i = 0; i < row; i++) 
+        for (let i = 0; i < this.rows; i++) 
         {
-            let columns = brickMatrix[0].length ;
+            this.columns = brickMatrix[0].length ;
             let colorIndex = (i + randomNumber) % this.allColors.length  ;
             let brickColor = this.allColors[colorIndex].color ;
             // console.log( colorIndex , brickColor  ) ;
             let brickHeight = 0 ;
             let spacing = 1 ;
             let brickRow = instantiate(this.rowBrickPrefab);
-            for (let j = 0; j < columns; j++) 
+            for (let j = 0; j < this.columns; j++) 
             {
                 if( brickMatrix[i][j] == 0 ) continue ;
                 this.totalBricks++ ;
                 let brick = instantiate(this.singleBrickPrefab);
                 let brickWidth = brick.getComponent(UITransform).width ;
-                brickHeight = brick.getComponent(UITransform).height ;
-                
-                let brickPosition = new Vec3( j * brickWidth - brickWidth*columns / 2 + spacing*j   , 0 , 0 )
+                brickHeight = brick.getComponent(UITransform).height ;   
+                let brickPosition = new Vec3( j * brickWidth - brickWidth*this.columns / 2 + spacing*j   , 0 , 0 )
                 brick.getComponent(Sprite).color = brickColor;
                 brick.setPosition(brickPosition) ;
                 brickRow.addChild(brick);
+                // brick.setScale( new Vec3(0 , 0 , 0) ) ;
+                brick.setScale( new Vec3(0 , 0 , 0) ) ;
             }
-            brickRow.setPosition( new Vec3( 0 , i * brickHeight - brickHeight*row / 2 + spacing*i , 0 ) )  ;
+            brickRow.setPosition( new Vec3( 0 , -(i * brickHeight - brickHeight*this.rows / 2 + spacing*i ), 0 ) )  ;
             this.allBricks.addChild(brickRow);
+            // break ;
         }
+        this.brickGenerateAnimation() ;
+        //
+        //
+        //
+        // // // // in below we don't need the brickRow but not usefull in game mode where we are removing whole row of brick
+        // // // // in below we don't need the brickRow but not usefull in game mode where we are removing whole row of brick
+        // for (let i = 0; i < row; i++) 
+        // {
+        //     let columns = brickMatrix[0].length ;
+        //     let colorIndex = (i + randomNumber) % this.allColors.length  ;
+        //     let brickColor = this.allColors[colorIndex].color ;
+        //     // console.log( colorIndex , brickColor  ) ;
+        //     let brickHeight = 0 ;
+        //     let spacing = 10 ;
+        //     let brickRow = instantiate(this.rowBrickPrefab);
+        //     for (let j = 0; j < columns; j++) 
+        //     {
+        //         if( brickMatrix[i][j] == 0 ) continue ;
+        //         this.totalBricks++ ;
+        //         let brick = instantiate(this.singleBrickPrefab);
+        //         let brickWidth = brick.getComponent(UITransform).width ;
+        //         brickHeight = brick.getComponent(UITransform).height ;
+        //         let brickPosition = new Vec3( j * brickWidth - brickWidth*columns / 2 + spacing*j   , i * brickHeight - brickHeight*row / 2 + spacing*i , 0 )
+        //         brick.getComponent(Sprite).color = brickColor;
+        //         brick.setPosition(brickPosition) ;
+        //         this.allBricks.addChild(brick);
+        //     }
+        // }
+    }
+    brickGenerateAnimation()
+    {
+        // //  using promise 
+        const promiseAnimations = [] ;
+        this.allBricks.children.forEach( (brickRow) => {
+            brickRow.children.forEach( (brick) => {
+                promiseAnimations.push(this.promiseBrickTweenAnimation(brick)); 
+            })
+        })
+        Promise.all(promiseAnimations).then(() => {
+            this.startGameTextAnimation();
+        });
+        //
+        // this.allBricks.children.forEach( (brickRow) => {
+        //     brickRow.children.forEach( (brick) => {
+        //         this.brickTweenAnimation1( brick ) ;  
+        //     })
+        // })
+        // this.brickTweenAnimation2( 0 , 0 ) ;  
+    }
+    promiseBrickTweenAnimation( brick : Node ) : Promise<void> {
+        return new Promise<void>((resolve) => {
+            tween(brick)
+            .to(1.5, { scale: new Vec3(1, 1, 1) }, { easing :'quadInOut' , 
+            onComplete : () => {
+                resolve() ;
+            }})
+            .start();
+        });
+    }
+   
+    brickTweenAnimation1( brick : Node  )
+    {
+        this.isBrickAnimating = true ;
+        // console.log( " brickTweenAnimation " , brick )
+        tween(brick)
+        .to(1.5 , { scale : new Vec3( 1 , 1 , 1) } , { easing :'quadInOut' , 
+            onComplete : () => {
+                this.isBrickAnimating = false ;
+                if( this.startGameAnimationFlag  ) this.startGameAnimationFlag = 0 , this.startGameTextAnimation() ;
+            }
+        })
+        .start() ;
+    }
+    brickTweenAnimation2( i : number , j : number  )
+    {
+        if( i == this.allBricks.children.length )
+        {
+            this.startGameTextAnimation() ;
+            return ;
+        }
+        this.isBrickAnimating = true ;
+        // console.log( " brickTweenAnimation " , this.allBricks.children[i].children[j].getPosition() )
+        tween(this.allBricks.children[i].children[j])
+        .to(0.3 , { scale : new Vec3( 1 , 1 , 1) } , { easing :'quadInOut' , 
+            onComplete : () => {
+                this.isBrickAnimating = false ;
+                if( j+1 == this.allBricks.children[i].children.length ) this.brickTweenAnimation2( i+1 , 0 ) ;
+                else this.brickTweenAnimation2( i , j+1 ) ;
+            }
+        })
+        .start() ;
+    }
+    startGameTextAnimation()
+    {
+        console.log( "lesstartgaem" ) ;
+        this.isBrickAnimating = true ;
+        const label = this.letsStartGame.getComponent(Label);
+        tween(this.letsStartGame)
+        .to(1, { fontSize : letstartGameFontSize   }  , {
+            onComplete : () => {
+                this.isBrickAnimating = false ;
+                this.play_icon.active = true  ;
+            }
+        } )
+        .start() ;
     }
 
 
 
-
-    timerAnimation( time : number )
+    countdownTimerAnimation( time : number )
     {
-        console.log( "timer " , time ) ;
+        // console.log( "timer " , time ) ;
         const label = this.countdownLabel.getComponent(Label);
         label.string = ` ${time} `;
         label.fontSize = countdownLabelFontSize ; 
@@ -263,7 +382,7 @@ export class gamePlay extends Component {
                     this.launchBall() ;
                     return ;
                 }
-                this.timerAnimation(time-1) ;
+                this.countdownTimerAnimation(time-1) ;
             }
         } )
         .start() ;
@@ -271,16 +390,15 @@ export class gamePlay extends Component {
     }
     launchBall() 
     {
-        console.log( "in launch",this.ballInitialPosition , this.ballImage.position ) ;
-        console.log( " launch ball " ) ;
+        // console.log( "in launch",this.ballInitialPosition , this.ballImage.position ) ;
+        // console.log( " launch ball " ) ;
         const ballRigidbody = this.ballImage.getComponent(RigidBody2D);
-        console.log( " launch rigidball " ,ballRigidbody )
+        // console.log( " launch rigidball " ,ballRigidbody )
         ballRigidbody.applyLinearImpulseToCenter( new Vec2(10 , 30) , true) ;
     }
-
     onBeginContact(contact: any, selfCollider: any, otherCollider: any) 
     {
-        console.log("on begin contact function");
+        // console.log("on begin contact function");
         const ballRigidbody = this.ballImage.getComponent(RigidBody2D);
 
         if (selfCollider.node === this.bottomWall) 
@@ -289,8 +407,8 @@ export class gamePlay extends Component {
             this.extraBalls.children[this.remainingBalls-1].destroy();
             this.remainingBalls--;
             if (this.remainingBalls == 0) {
-                console.log("game over");
-                director.loadScene(gamePlayScene);
+                // console.log("game over");
+                this.gameOver() ;
                 return;
             }
             this.changeBallColor() ;
@@ -304,7 +422,7 @@ export class gamePlay extends Component {
             // // // if( rig ) console.log( " avaidjcsk " ) ;
 
             this.isAnimating = true ; 
-            this.timerAnimation(3);
+            this.countdownTimerAnimation(3);
         }
         else if (selfCollider.node.parent.parent === this.allBricks  )    
         {
@@ -314,6 +432,8 @@ export class gamePlay extends Component {
             else if( this.gameMode == 4 ) this.removeSameColorBallAndWholeRowMode4( selfCollider.node , this.ballImage )
         }
     }
+
+
     changeBallColor()
     {
         let ballColor = this.ballImage.getComponent(Sprite).color ;
@@ -331,7 +451,7 @@ export class gamePlay extends Component {
     {
         if( this.checkSameColor( singleBrick , ballImg ) )
         {
-            console.log( " equals"  ) ;
+            // console.log( " equals"  ) ;
             this.incrementPlayerScore(1) ;
             singleBrick.destroy() ;
         }
@@ -358,7 +478,7 @@ export class gamePlay extends Component {
     {
         if( this.checkSameColor( singleBrick , ballImg ) )
         {
-            console.log( " equals"  ) ;
+            // console.log( " equals"  ) ;
             this.incrementPlayerScore(singleBrick.parent.children.length) ;
             // let allBricksLayout = this.allBricks.getComponent(Layout) ;
             // if( allBricksLayout ) allBricksLayout.destroy() ;
@@ -390,8 +510,8 @@ export class gamePlay extends Component {
 
     levelWinner()
     {
-        console.log( " levelwinner  ======> " ) ;
-        console.log( "gamemodeindex   " , this.gameMode , 'clicklevel  ' , this.clickedLevel , 'score  ' , this.score ) ;
+        // console.log( " levelwinner  ======> " ) ;
+        // console.log( "gamemodeindex   " , this.gameMode , 'clicklevel  ' , this.clickedLevel , 'score  ' , this.score ) ;
             
         Singleton.getInstance().setLevelScore( this.gameMode , this.clickedLevel, this.score);
 
@@ -401,31 +521,31 @@ export class gamePlay extends Component {
         // // // // this.resetBallandPlateformPosition() ;
         // // // // this.ballImage.destroy()  ;  
         //    
-        console.log( "Player is winner " ) ;
+        // console.log( "Player is winner " ) ;
         // window.alert( " Player is winner  " ) ;
         let gameModelevelWinner = Singleton.getInstance().getgameModeLevelWinner(this.gameMode) ;
-        let winningLabelText = '' ;
+        let popUpLabelText = '' ;
         if( gameModelevelWinner == this.totalLevels )
         {
             this.nextGame = gameModeSelectionScene ;
-            winningLabelText =  ` User completed the all levels of game mode ${this.gameMode} ` ;
-            console.log( winningLabel )
+            popUpLabelText =  ` User completed the all levels of game mode ${this.gameMode} ` ;
         }
         else
         {
             this.nextGame = levelSelectionScene ;
-            winningLabelText =  ` User completed the level ${this.clickedLevel} of game mode ${this.gameMode} ` ;
-            console.log( winningLabel )
+            popUpLabelText =  ` User completed the level ${this.clickedLevel} of game mode ${this.gameMode} ` ;
         }
 
-        let windDialog = instantiate(this.winPrefab);
-        let winnerPlayerNameLabel = windDialog.getChildByName(winningLabel);
-        winnerPlayerNameLabel.getComponent(Label).string = winningLabelText ;
-        let playNextGameButton = windDialog.getChildByName(playNextGame);
-        this.node.addChild(windDialog);
-        playNextGameButton.on(Button.EventType.CLICK , () => {
+
+        let popUpDialog = instantiate(this.popUpGamePlayScenePrefab);
+        popUpDialog.getChildByName(popUpLabel).getComponent(Label).string = popUpLabelText ;
+        let playGameButtonChild = popUpDialog.getChildByName(playGameButton).children[0] ;
+        let playGameButtonChildLabel = playGameButtonChild.getComponent(Label) ;
+        playGameButtonChildLabel.string = ' Play Next ' ;
+        popUpDialog.getChildByName(playGameButton).on(Button.EventType.CLICK , () => {
             director.loadScene(this.nextGame);
         } , this)
+        this.node.addChild(popUpDialog);
         
         
         
@@ -438,9 +558,26 @@ export class gamePlay extends Component {
         // director.loadScene(levelSelectionScene); 
     }
 
+    gameOver()
+    {
+        // console.log( "game over function " ) ;
+        const ballRigidbody = this.ballImage.getComponent(RigidBody2D);
+        ballRigidbody.sleep() ;
+        ballRigidbody.linearVelocity = new Vec2(0 , 0) ; 
+        let popUpDialog = instantiate(this.popUpGamePlayScenePrefab);
+        popUpDialog.getChildByName(popUpLabel).getComponent(Label).string = ` You lost the game . Play Again ` ;
+        let playGameButtonChild = popUpDialog.getChildByName(playGameButton).children[0] ;
+        let playGameButtonChildLabel = playGameButtonChild.getComponent(Label) ;
+        playGameButtonChildLabel.string = ' Play Again ' ;
+        popUpDialog.getChildByName(playGameButton).on(Button.EventType.CLICK , () => {
+            director.loadScene(levelSelectionScene);
+        } , this)
+        this.node.addChild(popUpDialog);
+    }
+
   
    
-    update(deltaTime: number) 
+    update(deltaTime: number)
     {
     }
 

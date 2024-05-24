@@ -45,7 +45,7 @@ export class gameModeSelection extends Component {
             this.errorText ="username should not have more than 15 characters " ;
             return  ;
         }
-        console.log( "username " , this.usernameInput.string  ) ;
+        // console.log( "username " , this.usernameInput.string  ) ;
         Singleton.getInstance().username = this.usernameInput.string ;
     }
 
@@ -64,7 +64,7 @@ export class gameModeSelection extends Component {
             this.generateErrorDialog(this.errorText)
             return ;
         }
-        console.log( parseInt(this.livesInput.string) ) ;
+        // console.log( parseInt(this.livesInput.string) ) ;
         Singleton.getInstance().totalLives = parseInt(this.livesInput.string) ;
     }
 
@@ -82,11 +82,11 @@ export class gameModeSelection extends Component {
     {
         if( isNaN( parseInt(this.livesInput.string) ) || parseInt(this.livesInput.string) == 0 )  
         {
-            console.log( "Please enter the valid number " ) ;
+            // console.log( "Please enter the valid number " ) ;
             return  ;
         }
         
-        console.log( "select game mode ", customEventData ) ;
+        // console.log( "select game mode ", customEventData ) ;
         Singleton.getInstance().gameMode = parseInt(customEventData) ;
         director.loadScene(levelSelectionScene)
     } 

@@ -33,10 +33,11 @@ export const lockImage = 'lockImage' ;
 
 
 // // in gameplay scene when palye start game and when ball drop then timer font size
+export const letstartGameFontSize = 40 ;
 export const countdownLabelFontSize = 130 ;
 // //  in gameplay scene after wining the level
-export const winningLabel = 'winningLabel' ;
-export const playNextGame = 'playNextGame' ;
+export const popUpLabel = 'popUpLabelText' ;
+export const playGameButton = 'playGame' ;
 
 
 
