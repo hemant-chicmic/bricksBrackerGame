@@ -143,13 +143,15 @@ export class gamePlay extends Component {
     restartGame()
     {
         // console.log("restart Game To levelSelectionScene");
-        Tween.stopAll();
+        director.resume();
+        Tween.stopAll() ;
         director.loadScene(levelSelectionScene);
     }
     exitGame()
     {
         // console.log("exit screen gameModeSelectionScene ");
-        Tween.stopAll();
+        director.resume();
+        Tween.stopAll() ;
         director.loadScene(gameModeSelectionScene);
     }
     OnOffMusicButton() 
@@ -541,6 +543,7 @@ export class gamePlay extends Component {
         let playGameButtonChildLabel = playGameButtonChild.getComponent(Label) ;
         playGameButtonChildLabel.string = ' Play Next ' ;
         popUpDialog.getChildByName(playGameButton).on(Button.EventType.CLICK , () => {
+            Tween.stopAll() ;
             director.loadScene(this.nextGame);
         } , this)
         this.node.addChild(popUpDialog);
@@ -553,6 +556,7 @@ export class gamePlay extends Component {
         // this.scheduleOnce( () => {
         //     this.generateBricksPattern() ;
         // }  , 0 ) ;
+        Tween.stopAll() ;
         // director.loadScene(levelSelectionScene); 
     }
     gameOver()
@@ -567,6 +571,7 @@ export class gamePlay extends Component {
         let playGameButtonChildLabel = playGameButtonChild.getComponent(Label) ;
         playGameButtonChildLabel.string = ' Play Again ' ;
         popUpDialog.getChildByName(playGameButton).on(Button.EventType.CLICK , () => {
+            Tween.stopAll() ;
             director.loadScene(levelSelectionScene);
         } , this)
         this.node.addChild(popUpDialog);

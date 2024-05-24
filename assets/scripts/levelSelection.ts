@@ -49,6 +49,7 @@ export class levelSelection extends Component {
 
     start() 
     {
+        console.log( " levelSeelction start function " )
         // if( Singleton.getInstance().username )  this.usernameID.string = Singleton.getInstance().username ;
         // if( Singleton.getInstance().gameMode )  this.gameModeIndex = Singleton.getInstance().gameMode ;
         this.usernameID.string = Singleton.getInstance().username ;
@@ -57,11 +58,11 @@ export class levelSelection extends Component {
         // console.log('game mde ' ,  this.gameModeIndex  ) ;
         Singleton.getInstance().totalLevel = this.allLevels.children.length ;
         let totalLevels = this.allLevels.children.length ;
-        // for(let i=0; i<5 ; i++)
-        // {
-        //     let prevLevel = Singleton.getInstance().getLevelScore(this.gameModeIndex , i ) ;  
-        //    console.log( ' level  prevlevel ' , prevLevel  ) ;
-        // }
+        for(let i=0; i<5 ; i++)
+        {
+            let prevLevel = Singleton.getInstance().getLevelScore(this.gameModeIndex , i ) ;  
+           console.log( ' level  prevlevel ' , prevLevel  ) ;
+        }
         for(let i=1; i<totalLevels ; i++)
         {
             let prevLevel = Singleton.getInstance().getLevelScore(this.gameModeIndex , i-1 ) ;  
