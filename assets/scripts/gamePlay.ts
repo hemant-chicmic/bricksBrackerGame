@@ -536,7 +536,7 @@ export class gamePlay extends Component {
             popUpLabelText =  ` User completed the level ${this.clickedLevel} of game mode ${this.gameMode} ` ;
         }
 
-
+ 
         let popUpDialog = instantiate(this.popUpGamePlayScenePrefab);
         popUpDialog.getChildByName(popUpLabel).getComponent(Label).string = popUpLabelText ;
         let playGameButtonChild = popUpDialog.getChildByName(playGameButton).children[0] ;
