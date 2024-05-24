@@ -110,7 +110,6 @@ export class gamePlay extends Component {
         else  director.resume() ;
         
     }
-    
     settingsButtom()
     {
         this.isSettingOpens = this.isSettingOpens == false ? true : false ;
@@ -316,7 +315,6 @@ export class gamePlay extends Component {
             .start();
         });
     }
-   
     brickTweenAnimation1( brick : Node  )
     {
         this.isBrickAnimating = true ;
@@ -557,7 +555,6 @@ export class gamePlay extends Component {
         // }  , 0 ) ;
         // director.loadScene(levelSelectionScene); 
     }
-
     gameOver()
     {
         // console.log( "game over function " ) ;
