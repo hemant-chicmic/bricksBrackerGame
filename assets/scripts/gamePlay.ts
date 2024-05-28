@@ -1,8 +1,9 @@
-import { _decorator, AudioSource, BoxCollider2D, Button, Collider2D, Color, Component, Contact2DType, director, EventMouse, instantiate, Intersection2D, Label, Layout, Node, PhysicsSystem2D, Prefab, randomRangeInt, RigidBody2D, sp, Sprite, tween, Tween, UITransform, Vec2, Vec3 } from 'cc';
+import { _decorator, AudioSource, BoxCollider2D, Button, Collider2D, Color, Component, Contact2DType, director, EventMouse, instantiate, Intersection2D, JsonAsset, Label, Layout, loader, Node, PhysicsSystem2D, Prefab, randomRangeInt, resources, RigidBody2D, sp, Sprite, tween, Tween, UITransform, Vec2, Vec3 } from 'cc';
 import { gamePlayScene , levelSelectionScene , letstartGameFontSize , countdownLabelFontSize, gameModeSelectionScene , popUpLabel , playGameButton } from './constants' ;
 import { Singleton } from './gameManager/singleton';
-import { brickPatternDesigns } from './bricksPatterns';
+import { brickPatternDesigns } from './brickPatterns/bricksPatterns';
 import { switchButton } from './Utility';
+import { setUserData , getUserData , updateScore , getUserGameData , setUserLoginStatus , getUserLoginStatus } from './ScoreManagerLocalStorage' ;
 
 
 const { ccclass, property } = _decorator;
@@ -10,6 +11,9 @@ const { ccclass, property } = _decorator;
 @ccclass('gamePlay')
 export class gamePlay extends Component {
 
+
+    @property( {type:JsonAsset} )
+    brickPatterDataJSON : JsonAsset | null = null ;
 
     @property( {type : Label} )
     usernameID : Label | null = null ;
@@ -96,6 +100,7 @@ export class gamePlay extends Component {
     private nextGame : string ;
     private startFirstTime : number = 1 ;
     private startGameAnimationFlag : number = 1 ;
+    private newBrickPatter : { brickColor: Color; breakFreq: number }[][] = [];
     
 
 
@@ -221,72 +226,126 @@ export class gamePlay extends Component {
     }
 
 
+    // generateBricksPattern()
+    // {
+    //     // console.log( "brick pattern function "  )
+    //     // let totalPatternDesigns = brickPatternDesigns.length  ;
+    //     // let selectRandomPattern = randomRangeInt(0 , totalPatternDesigns ) ;
+    //     // console.log( " random index " , selectRandomPattern ) ;
+    //     // let brickMatrix = brickPatternDesigns[selectRandomPattern] ;
+    //     let brickMatrix = brickPatternDesigns[this.clickedLevel] ;
+    //     this.rows = brickMatrix.length ;
+    //     let randomNumber = randomRangeInt(0 , this.allColors.length)
+    //     for (let i = 0; i < this.rows; i++) 
+    //     {
+    //         this.columns = brickMatrix[0].length ;
+    //         let colorIndex = (i + randomNumber) % this.allColors.length  ;
+    //         let brickColor = this.allColors[colorIndex].color ;
+    //         // console.log( colorIndex , brickColor  ) ;
+    //         let brickHeight = 0 ;
+    //         let spacing = 1 ;
+    //         let brickRow = instantiate(this.rowBrickPrefab);
+    //         for (let j = 0; j < this.columns; j++) 
+    //         {
+    //             if( brickMatrix[i][j] == 0 ) continue ;
+    //             this.totalBricks++ ;
+    //             let brick = instantiate(this.singleBrickPrefab);
+    //             let brickWidth = brick.getComponent(UITransform).width ;
+    //             brickHeight = brick.getComponent(UITransform).height ;   
+    //             let brickPosition = new Vec3( j * brickWidth - brickWidth*this.columns / 2 + spacing*j   , 0 , 0 )
+    //             brick.getComponent(Sprite).color = brickColor;
+    //             brick.setPosition(brickPosition) ;
+    //             brickRow.addChild(brick);
+    //             // brick.setScale( new Vec3(0 , 0 , 0) ) ;
+    //             brick.setScale( new Vec3(0 , 0 , 0) ) ;
+    //         }
+    //         brickRow.setPosition( new Vec3( 0 , -(i * brickHeight - brickHeight*this.rows / 2 + spacing*i ), 0 ) )  ;
+    //         this.allBricks.addChild(brickRow);
+    //         // break ;
+    //     }
+    //     this.brickGenerateAnimation() ;
+    //     //
+    //     //
+    //     //
+    //     // // // // in below we don't need the brickRow but not usefull in game mode where we are removing whole row of brick
+    //     // // // // in below we don't need the brickRow but not usefull in game mode where we are removing whole row of brick
+    //     // for (let i = 0; i < row; i++) 
+    //     // {
+    //     //     let columns = brickMatrix[0].length ;
+    //     //     let colorIndex = (i + randomNumber) % this.allColors.length  ;
+    //     //     let brickColor = this.allColors[colorIndex].color ;
+    //     //     // console.log( colorIndex , brickColor  ) ;
+    //     //     let brickHeight = 0 ;
+    //     //     let spacing = 10 ;
+    //     //     let brickRow = instantiate(this.rowBrickPrefab);
+    //     //     for (let j = 0; j < columns; j++) 
+    //     //     {
+    //     //         if( brickMatrix[i][j] == 0 ) continue ;
+    //     //         this.totalBricks++ ;
+    //     //         let brick = instantiate(this.singleBrickPrefab);
+    //     //         let brickWidth = brick.getComponent(UITransform).width ;
+    //     //         brickHeight = brick.getComponent(UITransform).height ;
+    //     //         let brickPosition = new Vec3( j * brickWidth - brickWidth*columns / 2 + spacing*j   , i * brickHeight - brickHeight*row / 2 + spacing*i , 0 )
+    //     //         brick.getComponent(Sprite).color = brickColor;
+    //     //         brick.setPosition(brickPosition) ;
+    //     //         this.allBricks.addChild(brick);
+    //     //     }
+    //     // }
+    // }
+    
     generateBricksPattern()
     {
-        // console.log( "brick pattern function "  )
-        // let totalPatternDesigns = brickPatternDesigns.length  ;
-        // let selectRandomPattern = randomRangeInt(0 , totalPatternDesigns ) ;
-        // console.log( " random index " , selectRandomPattern ) ;
-        // let brickMatrix = brickPatternDesigns[selectRandomPattern] ;
-        let brickMatrix = brickPatternDesigns[this.clickedLevel] ;
-        this.rows = brickMatrix.length ;
-        let randomNumber = randomRangeInt(0 , this.allColors.length)
+        console.log( "brickPatterDataJSON => " , this.brickPatterDataJSON.json )
+       
+        this.rows = this.brickPatterDataJSON.json.length -5;
+        this.columns = this.brickPatterDataJSON.json[0].length -5;
+
         for (let i = 0; i < this.rows; i++) 
         {
-            this.columns = brickMatrix[0].length ;
-            let colorIndex = (i + randomNumber) % this.allColors.length  ;
-            let brickColor = this.allColors[colorIndex].color ;
-            // console.log( colorIndex , brickColor  ) ;
-            let brickHeight = 0 ;
-            let spacing = 1 ;
-            let brickRow = instantiate(this.rowBrickPrefab);
-            for (let j = 0; j < this.columns; j++) 
+            this.newBrickPatter[i] = [] ;
+            for (let j = 0; j < this.columns ; j++) 
             {
-                if( brickMatrix[i][j] == 0 ) continue ;
+                this.newBrickPatter[i][j] = this.brickPatterDataJSON.json[i][j] ;            
+            }
+        }
+        
+        console.log( "okokokok " ) ;
+        for (let i = 0; i < this.rows; i++) 
+        {
+            let brickHeight = 0 ;
+            let spacing = 2 ;
+            let brickRow = instantiate(this.rowBrickPrefab);
+            for (let j = 0; j < this.columns ; j++) 
+            {
+                let freq = this.newBrickPatter[i][j].breakFreq ;
+                if( freq == 0 ) continue ;
+                console.log( i , j , freq ) ;
+                let BrickColor = this.newBrickPatter[i][j].brickColor ; 
                 this.totalBricks++ ;
                 let brick = instantiate(this.singleBrickPrefab);
                 let brickWidth = brick.getComponent(UITransform).width ;
                 brickHeight = brick.getComponent(UITransform).height ;   
                 let brickPosition = new Vec3( j * brickWidth - brickWidth*this.columns / 2 + spacing*j   , 0 , 0 )
-                brick.getComponent(Sprite).color = brickColor;
+                brick.getComponent(Sprite).color = BrickColor;
                 brick.setPosition(brickPosition) ;
                 brickRow.addChild(brick);
-                // brick.setScale( new Vec3(0 , 0 , 0) ) ;
                 brick.setScale( new Vec3(0 , 0 , 0) ) ;
             }
             brickRow.setPosition( new Vec3( 0 , -(i * brickHeight - brickHeight*this.rows / 2 + spacing*i ), 0 ) )  ;
             this.allBricks.addChild(brickRow);
-            // break ;
+          
         }
+
         this.brickGenerateAnimation() ;
-        //
-        //
-        //
-        // // // // in below we don't need the brickRow but not usefull in game mode where we are removing whole row of brick
-        // // // // in below we don't need the brickRow but not usefull in game mode where we are removing whole row of brick
-        // for (let i = 0; i < row; i++) 
-        // {
-        //     let columns = brickMatrix[0].length ;
-        //     let colorIndex = (i + randomNumber) % this.allColors.length  ;
-        //     let brickColor = this.allColors[colorIndex].color ;
-        //     // console.log( colorIndex , brickColor  ) ;
-        //     let brickHeight = 0 ;
-        //     let spacing = 10 ;
-        //     let brickRow = instantiate(this.rowBrickPrefab);
-        //     for (let j = 0; j < columns; j++) 
-        //     {
-        //         if( brickMatrix[i][j] == 0 ) continue ;
-        //         this.totalBricks++ ;
-        //         let brick = instantiate(this.singleBrickPrefab);
-        //         let brickWidth = brick.getComponent(UITransform).width ;
-        //         brickHeight = brick.getComponent(UITransform).height ;
-        //         let brickPosition = new Vec3( j * brickWidth - brickWidth*columns / 2 + spacing*j   , i * brickHeight - brickHeight*row / 2 + spacing*i , 0 )
-        //         brick.getComponent(Sprite).color = brickColor;
-        //         brick.setPosition(brickPosition) ;
-        //         this.allBricks.addChild(brick);
-        //     }
-        // }
+        
     }
+
+
+
+
+
+
+
     brickGenerateAnimation()
     {
         // //  using promise 
@@ -426,10 +485,19 @@ export class gamePlay extends Component {
         }
         else if (selfCollider.node.parent.parent === this.allBricks  )    
         {
-            if( this.gameMode == 1 ) this.normalSingleBrickRemovalMode1( selfCollider.node ) ;
-            else if( this.gameMode == 2 ) this.removeSameColorBallAndSingleBrickMode2(selfCollider.node , this.ballImage) ;
-            else if( this.gameMode == 3 ) this.removeBrickWholeRowMode3( selfCollider.node )
-            else if( this.gameMode == 4 ) this.removeSameColorBallAndWholeRowMode4( selfCollider.node , this.ballImage )
+            let brickNodeIndex  = selfCollider.node.getSiblingIndex() ;
+            let parentIndex = selfCollider.node.parent.getSiblingIndex() ;
+            console.log( "index " , parentIndex , brickNodeIndex );
+            console.log( "freq1111ok " , this.newBrickPatter[brickNodeIndex][parentIndex].breakFreq );
+            this.newBrickPatter[brickNodeIndex][parentIndex].breakFreq -- ;
+            console.log( "freq2222ok " , this.newBrickPatter[brickNodeIndex][parentIndex].breakFreq );
+            if( this.newBrickPatter[brickNodeIndex][parentIndex].breakFreq == 0 )
+            {
+                if( this.gameMode == 1 ) this.normalSingleBrickRemovalMode1( selfCollider.node ) ;
+                else if( this.gameMode == 2 ) this.removeSameColorBallAndSingleBrickMode2(selfCollider.node , this.ballImage) ;
+                else if( this.gameMode == 3 ) this.removeBrickWholeRowMode3( selfCollider.node )
+                else if( this.gameMode == 4 ) this.removeSameColorBallAndWholeRowMode4( selfCollider.node , this.ballImage )
+            }
         }
     }
 
@@ -513,6 +581,9 @@ export class gamePlay extends Component {
         // console.log( " levelwinner  ======> " ) ;
         // console.log( "gamemodeindex   " , this.gameMode , 'clicklevel  ' , this.clickedLevel , 'score  ' , this.score ) ;
             
+
+        
+        updateScore(this.usernameID.string , this.gameMode-1 , this.clickedLevel, this.score);
         Singleton.getInstance().setLevelScore( this.gameMode , this.clickedLevel, this.score);
 
         const ballRigidbody = this.ballImage.getComponent(RigidBody2D);
@@ -523,7 +594,10 @@ export class gamePlay extends Component {
         //    
         // console.log( "Player is winner " ) ;
         // window.alert( " Player is winner  " ) ;
-        let gameModelevelWinner = Singleton.getInstance().getgameModeLevelWinner(this.gameMode) ;
+        // let gameModelevelWinner = Singleton.getInstance().getgameModeLevelWinner(this.gameMode) ;
+        const userData = getUserData();
+        const gameData = userData[this.usernameID.string ].gameData;
+        let gameModelevelWinner = gameData[this.gameMode-1].length ;
         let popUpLabelText = '' ;
         if( gameModelevelWinner == this.totalLevels )
         {

@@ -3,6 +3,7 @@
 
 
 
+export const startScene = 'startScene' ;
 export const gameModeSelectionScene = 'gameModeSelection' ;
 export const levelSelectionScene = 'levelSelection' ;
 export const gamePlayScene = 'gamePlay' ;

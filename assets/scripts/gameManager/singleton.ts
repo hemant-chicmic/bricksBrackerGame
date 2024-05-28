@@ -16,6 +16,17 @@ export class Singleton {
 
 
 
+  private _usernameLogin : boolean ;
+  public set usernameLogin ( val : boolean )
+  {
+    this._usernameLogin = val ;
+  }
+  public get usernameLogin()
+  {
+    return this._usernameLogin ;
+  }
+
+
   private _username : string ;
   public set username( val : string )
   {

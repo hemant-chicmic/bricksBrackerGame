@@ -1,6 +1,8 @@
 import { _decorator, Button, Component, director, EditBox, instantiate, Label, Node, Prefab } from 'cc';
 import { Singleton } from './gameManager/singleton';
-import { levelSelectionScene , levelNumberBG , okButton, errorLabel } from './constants' ;
+import { startScene , levelSelectionScene , levelNumberBG , okButton, errorLabel } from './constants' ;
+import { setUserData , getUserData , updateScore , getUserGameData , setUserLoginStatus , getUserLoginStatus } from './ScoreManagerLocalStorage' ;
+
 
 const { ccclass, property } = _decorator;
 
@@ -21,6 +23,17 @@ export class gameModeSelection extends Component {
     private errorText : string ;
 
 
+
+    logoutClearLocalStorage()
+    {
+        console.log(  "logoutClearLocalStorage " ) ;
+        localStorage.clear() ;
+        Singleton.getInstance().usernameLogin  = false ;
+        setUserLoginStatus(this.usernameInput.string  , false )
+        director.loadScene( startScene ) ;
+    }
+
+
     start() 
     {
         this.livesInput.node.on(EditBox.EventType.EDITING_DID_ENDED, this.takeLivesInput, this);
@@ -31,6 +44,10 @@ export class gameModeSelection extends Component {
         //     Singleton.getInstance().setLevelScore(1 , i , i*10) ;  
         //     // console.log( ' mode  prevlevel ' , prevLevel ) ;
         // }
+        const userData = getUserData();
+        const username = Object.keys(userData)[0]; 
+        delete userData[username];
+        if (username && getUserLoginStatus(username)) this.usernameInput.string = username  ;
     }
 
     takeUsernameInput()
@@ -45,6 +62,7 @@ export class gameModeSelection extends Component {
             this.errorText ="username should not have more than 15 characters " ;
             return  ;
         }
+        
         // console.log( "username " , this.usernameInput.string  ) ;
         Singleton.getInstance().username = this.usernameInput.string ;
     }
@@ -88,6 +106,20 @@ export class gameModeSelection extends Component {
         
         // console.log( "select game mode ", customEventData ) ;
         Singleton.getInstance().gameMode = parseInt(customEventData) ;
+        const userData = getUserData();
+        const username = Object.keys(userData)[0]; 
+        if (username && getUserLoginStatus(username)) 
+        {
+            console.log( " old data " ) ;
+            const oldData = userData[username];
+            userData[this.usernameInput.string] = oldData ;
+            delete userData[username];
+            localStorage.removeItem(username);
+            setUserData(userData);
+        }
+        if( ! userData[this.usernameInput.string] ) updateScore( this.usernameInput.string , parseInt(customEventData)-1 , 0 , 0 )
+        Singleton.getInstance().usernameLogin  = true ;
+        setUserLoginStatus(this.usernameInput.string  , true ) ;
         director.loadScene(levelSelectionScene)
     } 
 
