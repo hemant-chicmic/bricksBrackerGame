@@ -1,7 +1,7 @@
 import { _decorator, Button, Component, director, Label, Node, Prefab } from 'cc';
 import { Singleton } from './gameManager/singleton';
 import { lockImage , gameModeSelectionScene ,  gamePlayScene , levelNumberBG } from './constants' ;
-import { setUserData , getUserData , updateScore , getUserGameData , setUserLoginStatus , getUserLoginStatus } from './ScoreManagerLocalStorage' ;
+import { setUserData , getUserData , updateScore } from './ScoreManagerLocalStorage' ;
 
 
 
@@ -19,13 +19,14 @@ export class levelSelection extends Component {
     allLevels: Node | null = null;
 
 
+    private totalLevels : any ; 
+    private userData : any ; 
     private gameModeIndex : number = 0 ;
 
-
-    clickLevels( event: Event, customEventData: string )
+    clickLevels( event: Event, clickLevelIndex: string )
     {
         // console.log( " clikced levels " , customEventData )
-        Singleton.getInstance().clickLevel = parseInt(customEventData) ;
+        Singleton.getInstance().clickLevel = parseInt(clickLevelIndex) ;
         director.loadScene(gamePlayScene) ;
     }
 
@@ -45,11 +46,12 @@ export class levelSelection extends Component {
             // Singleton.getInstance().clickLevel = i-1 ;
             // director.loadScene(gamePlayScene) ;
             
-            const userData = getUserData();
-            const gameData = userData[this.usernameID.string ].gameData;
-            let lastLevel = gameData[this.gameModeIndex-1].length ;
-            let score = gameData[this.gameModeIndex-1][lastLevel-1] ;
-            Singleton.getInstance().clickLevel = score > 0 ? lastLevel : lastLevel-1  ;
+            const gameData = this.userData[this.usernameID.string ].gameData;
+            let lastLevel = gameData[this.gameModeIndex].length ;
+            let score = gameData[this.gameModeIndex][lastLevel-1] ;
+            Singleton.getInstance().clickLevel = score > 0 ? lastLevel%this.totalLevels : lastLevel-1  ;
+            // Singleton.getInstance().clickLevel = lastLevel-1  ;
+            // console.log( "lastleev " , lastLevel-1 ) ;
             director.loadScene(gamePlayScene) ;
         }
     }
@@ -60,11 +62,14 @@ export class levelSelection extends Component {
     
     start() 
     {
-        console.log( " levelSeelction start function " )
+        // console.log( " levelSeelction start function " )
         // if( Singleton.getInstance().username )  this.usernameID.string = Singleton.getInstance().username ;
         // if( Singleton.getInstance().gameMode )  this.gameModeIndex = Singleton.getInstance().gameMode ;
-        this.usernameID.string = Singleton.getInstance().username ;
         this.gameModeIndex = Singleton.getInstance().gameMode ;
+        this.userData = getUserData();
+        const username = Object.keys(this.userData)[0]; 
+        if ( !username ) return ;
+        this.usernameID.string = username  ;
 
         // console.log('game mde ' ,  this.gameModeIndex  ) ;
         // Singleton.getInstance().totalLevel = this.allLevels.children.length ;
@@ -81,31 +86,44 @@ export class levelSelection extends Component {
         //     this.openLevel( i , prevLevel > 0 ? true : false )  ;
         // }
 
-
-
-
-        const userData = getUserData();
-        console.log( ' userData   ' , userData ) ;
-        if (!userData ) return ;
-        console.log( ' this.usernameID.string   ' , this.usernameID.string ,  " usernameDate" , userData[this.usernameID.string] ) ;
-        if (!userData[this.usernameID.string]) return ;
-        const gameData = userData[this.usernameID.string].gameData;
-        console.log( ' gameData   ' , gameData , "game mode " , this.gameModeIndex-1, 'length ' , gameData[this.gameModeIndex-1].length ) ;
-        for(let i=1; i<=gameData[this.gameModeIndex-1].length ; i++)
+        // console.log( "gameModeIndex " , this.gameModeIndex)
+        const gameData = this.userData[this.usernameID.string].gameData;
+        // console.log( gameData[this.gameModeIndex][0]  )
+        // for(let i=1; i<=gameData[this.gameModeIndex-1].length ; i++)
+        // {
+        //     let prevLevel = gameData[this.gameModeIndex-1][i-1] ;  
+        //     console.log( ' level-prevlevel   ' , prevLevel , "game mode " , this.gameModeIndex-1, 'level ' , i-1  ) ;
+        //     if( ! prevLevel ) break ;
+        //     this.openLevel( i , prevLevel > 0 ? true : false )  ;
+        // }
+        // console.log( this.gameModeIndex , gameData ) ;
+        this.totalLevels = this.allLevels.children.length ;
+        Singleton.getInstance().totalLevel = this.totalLevels ;
+        for(let i=1; i<this.totalLevels ; i++)
         {
-            let prevLevel = gameData[this.gameModeIndex-1][i-1] ;  
-            console.log( ' level-prevlevel   ' , prevLevel , "game mode " , this.gameModeIndex-1, 'level ' , i-1  ) ;
-            if( ! prevLevel ) break ;
+            let prevLevel = gameData[this.gameModeIndex][i-1] ;  
+            // console.log( ' level-prevlevel   ' , prevLevel , "game mode " , this.gameModeIndex, 'level ' , i-1  ) ;
             this.openLevel( i , prevLevel > 0 ? true : false )  ;
-            
         }
+        
     }
 
+    // openLevel( levelInd : number , flag : boolean )
+    // {
+    //     let totalLevels = this.allLevels.children.length ;
+    //     if( levelInd >= totalLevels ) return ;
+    //     // console.log( levelInd , flag ) ;
+    //     let level = this.allLevels.children[levelInd] ;
+    //     let levelNumberBGImg = level.getChildByName(levelNumberBG) ;    
+    //     let levelNumberBGImgButton = levelNumberBGImg.getComponent(Button) ;
+    //     levelNumberBGImgButton.interactable = flag ; 
+    //     let levelLockImag = level.getChildByName(lockImage) ;    
+    //     levelLockImag.active = !flag ;
+    // }
+    
+    
     openLevel( levelInd : number , flag : boolean )
     {
-        let totalLevels = this.allLevels.children.length ;
-        if( levelInd >= totalLevels ) return ;
-        // console.log( levelInd , flag ) ;
         let level = this.allLevels.children[levelInd] ;
         let levelNumberBGImg = level.getChildByName(levelNumberBG) ;    
         let levelNumberBGImgButton = levelNumberBGImg.getComponent(Button) ;

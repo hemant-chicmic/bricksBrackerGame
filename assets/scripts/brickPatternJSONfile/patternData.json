@@ -1,10 +1,197 @@
 [
   [
     {
+      "breakFreq": 0
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "brickColor": {
+        "_val": 4278255360
+      },
+      "breakFreq": 1
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "brickColor": {
+        "_val": 4278232575
+      },
+      "breakFreq": 3
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "breakFreq": 0
+    }
+  ],
+  [
+    {
+      "breakFreq": 0
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "brickColor": {
+        "_val": 4278255360
+      },
+      "breakFreq": -1
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "breakFreq": 0
+    }
+  ],
+  [
+    {
+      "breakFreq": 0
+    },
+    {
       "brickColor": {
         "_val": 4278190335
       },
-      "breakFreq": 3
+      "breakFreq": 1
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "brickColor": {
+        "_val": 4278255360
+      },
+      "breakFreq": 1
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "brickColor": {
+        "_val": 4278232575
+      },
+      "breakFreq": -1
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "breakFreq": 0
+    }
+  ],
+  [
+    {
+      "breakFreq": 0
+    },
+    {
+      "brickColor": {
+        "_val": 4278190335
+      },
+      "breakFreq": -1
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "brickColor": {
+        "_val": 4278255615
+      },
+      "breakFreq": -1
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "breakFreq": 0
+    }
+  ],
+  [
+    {
+      "breakFreq": 0
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "brickColor": {
+        "_val": 4278190335
+      },
+      "breakFreq": 1
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "brickColor": {
+        "_val": 4278255615
+      },
+      "breakFreq": 1
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "breakFreq": 0
+    },
+    {
+      "breakFreq": 0
+    }
+  ],
+  [
+    {
+      "breakFreq": 0
     },
     {
       "brickColor": {
@@ -13,46 +200,31 @@
       "breakFreq": 3
     },
     {
+      "breakFreq": 0
+    },
+    {
       "brickColor": {
-        "_val": 4278190335
+        "_val": 4278255360
+      },
+      "breakFreq": 2
+    },
+    {
+      "brickColor": {
+        "_val": 4278255615
       },
       "breakFreq": 3
     },
     {
-      "brickColor": {
-        "_val": 4278190335
-      },
-      "breakFreq": 3
+      "breakFreq": 0
     },
     {
-      "brickColor": {
-        "_val": 4278190335
-      },
-      "breakFreq": 3
+      "breakFreq": 0
     },
     {
-      "brickColor": {
-        "_val": 4278190335
-      },
-      "breakFreq": 3
+      "breakFreq": 0
     },
     {
-      "brickColor": {
-        "_val": 4278190335
-      },
-      "breakFreq": 3
-    },
-    {
-      "brickColor": {
-        "_val": 4278190335
-      },
-      "breakFreq": 3
-    },
-    {
-      "brickColor": {
-        "_val": 4278190335
-      },
-      "breakFreq": 3
+      "breakFreq": 0
     },
     {
       "breakFreq": 0
@@ -127,7 +299,10 @@
       "breakFreq": 0
     },
     {
-      "breakFreq": 0
+      "brickColor": {
+        "_val": 4278190335
+      },
+      "breakFreq": 2
     },
     {
       "breakFreq": 0
@@ -165,167 +340,10 @@
       "breakFreq": 0
     },
     {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    }
-  ],
-  [
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    }
-  ],
-  [
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    }
-  ],
-  [
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    }
-  ],
-  [
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    }
-  ],
-  [
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
-    },
-    {
-      "breakFreq": 0
+      "brickColor": {
+        "_val": 4278255360
+      },
+      "breakFreq": 3
     },
     {
       "breakFreq": 0

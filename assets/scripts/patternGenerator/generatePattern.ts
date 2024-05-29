@@ -1,11 +1,13 @@
-import { _decorator, Button, Color, Component, EventHandler, instantiate, Node, Prefab, Sprite, UITransform, Vec3 } from 'cc';
+import { _decorator, Button, Color, Component, EventHandler, instantiate, JsonAsset, Label, Node, Prefab, Sprite, UITransform, Vec3 } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('generatePattern')
 
 export class generatePattern extends Component {
 
-
+    @property( {type:JsonAsset} )
+    brickPatterDataJSON : JsonAsset | null = null ;
+    
     @property({ type: Node })
     allBricks: Node | null = null;
     @property({ type: Prefab })
@@ -34,7 +36,6 @@ export class generatePattern extends Component {
 
 
 
-
     start() 
     {
         this.rows = 10 ;
@@ -57,6 +58,17 @@ export class generatePattern extends Component {
                 clickEventHandler.handler = 'makeBrick';
                 clickEventHandler.customEventData = `${i},${j}`;
                 brickButtonComponent.clickEvents.push(clickEventHandler);
+
+
+                let labelNode = new Node();
+                let brickLabel = labelNode.addComponent(Label);
+                brickLabel.fontSize = 25;
+                brickLabel.color = new Color(0, 0, 0); // Set the text color to black
+                brickLabel.string = '0';
+        
+                // Add the label node as a child of the brick
+                brick.addChild(labelNode);
+        
 
                 let brickWidth = brick.getComponent(UITransform).width ;
                 brickHeight = brick.getComponent(UITransform).height ;   
@@ -129,6 +141,8 @@ export class generatePattern extends Component {
         brick.getComponent(Sprite).color = this.selectedColor  ;
         this.brickPatternData[i][j] = { brickColor: this.selectedColor , breakFreq: this.brickBreakFreq };
         console.log( " pateerdata" , this.brickPatternData[i][j] ) ;
+        let brickLabel = brick.children[0].getComponent(Label)  ;
+        brickLabel.string = this.brickBreakFreq.toString() ;
     }
 
     
@@ -155,6 +169,8 @@ export class generatePattern extends Component {
     savePattern() {
         console.log("savePattern");
         console.log(this.brickPatternData);
+
+        this.brickPatterDataJSON.json = this.brickPatternData;
     
         // Convert pattern data array to JSON string
         this.scheduleOnce( () => {

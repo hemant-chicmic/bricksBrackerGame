@@ -1,17 +1,26 @@
 
-interface UserLoginStatus {
-    userLogin: boolean;
-}
+// interface UserLoginStatus {
+//     userLogin: boolean;
+// }
+
+// interface UserData {
+//     gameData: number[][];
+//     userLoginStatus: UserLoginStatus;
+// }
+
+// interface UserDatabase {
+//     [username: string]: UserData;
+// }
+
+
 
 interface UserData {
     gameData: number[][];
-    userLoginStatus: UserLoginStatus;
 }
 
 interface UserDatabase {
     [username: string]: UserData;
 }
-
 
 
 
@@ -31,37 +40,43 @@ export function updateScore(username: string, gameModeIndex: number, levelIndex:
 {
     const userData = getUserData();
 
-    if (!userData[username]) userData[username] = { gameData: [], userLoginStatus: { userLogin: false } };
+    // if (!userData[username]) userData[username] = { gameData: [], userLoginStatus: { userLogin: false } };
+    if (!userData[username]) userData[username] = { gameData: [] };
 
     const gameData = userData[username].gameData;
 
     if (!gameData[gameModeIndex]) gameData[gameModeIndex] = [];
+
+    // console.log(  "local" , gameModeIndex , [gameModeIndex] )
 
     gameData[gameModeIndex][levelIndex] = newScore;
 
     setUserData(userData);
 }
 
-export function getUserGameData(username: string): number[][] | null
-{
-    const userData = getUserData();
-    return userData[username]?.gameData || null;
-}
 
-export function setUserLoginStatus(username: string, loginStatus: boolean) {
-    const userData = getUserData();
-    if (userData[username]) 
-    {
-        userData[username].userLoginStatus = { userLogin: loginStatus };
-        setUserData(userData);
-    }
-}
 
-export function getUserLoginStatus(username: string): boolean | undefined 
-{
-    const userData = getUserData();
-    return userData[username]?.userLoginStatus?.userLogin;
-}
+
+// export function getUserGameData(username: string): number[][] | null
+// {
+//     const userData = getUserData();
+//     return userData[username]?.gameData || null;
+// }
+
+// export function setUserLoginStatus(username: string, loginStatus: boolean) {
+//     const userData = getUserData();
+//     if (userData[username]) 
+//     {
+//         userData[username].userLoginStatus = { userLogin: loginStatus };
+//         setUserData(userData);
+//     }
+// }
+
+// export function getUserLoginStatus(username: string): boolean | undefined 
+// {
+//     const userData = getUserData();
+//     return userData[username]?.userLoginStatus?.userLogin;
+// }
 
 
 

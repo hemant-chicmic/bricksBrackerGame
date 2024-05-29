@@ -1,7 +1,7 @@
 import { _decorator, Button, Component, director, EditBox, instantiate, Label, Node, Prefab } from 'cc';
 import { Singleton } from './gameManager/singleton';
 import { startScene , levelSelectionScene , levelNumberBG , okButton, errorLabel } from './constants' ;
-import { setUserData , getUserData , updateScore , getUserGameData , setUserLoginStatus , getUserLoginStatus } from './ScoreManagerLocalStorage' ;
+import { setUserData , getUserData , updateScore  } from './ScoreManagerLocalStorage' ;
 
 
 const { ccclass, property } = _decorator;
@@ -22,14 +22,14 @@ export class gameModeSelection extends Component {
 
     private errorText : string ;
 
+    private userData : any ; 
+
 
 
     logoutClearLocalStorage()
     {
-        console.log(  "logoutClearLocalStorage " ) ;
+        // console.log(  "logoutClearLocalStorage " ) ;
         localStorage.clear() ;
-        Singleton.getInstance().usernameLogin  = false ;
-        setUserLoginStatus(this.usernameInput.string  , false )
         director.loadScene( startScene ) ;
     }
 
@@ -44,10 +44,9 @@ export class gameModeSelection extends Component {
         //     Singleton.getInstance().setLevelScore(1 , i , i*10) ;  
         //     // console.log( ' mode  prevlevel ' , prevLevel ) ;
         // }
-        const userData = getUserData();
-        const username = Object.keys(userData)[0]; 
-        delete userData[username];
-        if (username && getUserLoginStatus(username)) this.usernameInput.string = username  ;
+        this.userData = getUserData();
+        const username = Object.keys(this.userData)[0]; 
+        if ( username ) this.usernameInput.string = username  ;
     }
 
     takeUsernameInput()
@@ -62,9 +61,20 @@ export class gameModeSelection extends Component {
             this.errorText ="username should not have more than 15 characters " ;
             return  ;
         }
-        
+        const oldUsername = Object.keys(this.userData)[0]; 
+        if ( oldUsername ) 
+        {
+            // console.log( " old data " ) ;
+            const oldData = this.userData[oldUsername];
+            this.userData[this.usernameInput.string] = oldData ;
+            delete this.userData[oldUsername];
+            localStorage.removeItem(oldUsername);
+            setUserData(this.userData);
+        }
+        // // // if username does not exits means local storage is empty means it is the first time then whatever user enter
+        // // // the username so when user will click on game mode it will set the score with gamemode in the selectGameMode function
         // console.log( "username " , this.usernameInput.string  ) ;
-        Singleton.getInstance().username = this.usernameInput.string ;
+        // Singleton.getInstance().username = this.usernameInput.string ;
     }
 
 
@@ -79,7 +89,7 @@ export class gameModeSelection extends Component {
         else if( parseInt(this.livesInput.string) > 10 ) 
         {
             this.errorText = "Please enter no less than or equal to 10 " ;
-            this.generateErrorDialog(this.errorText)
+            this.generateErrorDialog(this.errorText) ;
             return ;
         }
         // console.log( parseInt(this.livesInput.string) ) ;
@@ -96,30 +106,25 @@ export class gameModeSelection extends Component {
         okButtomChild.on(Button.EventType.CLICK, () => { errorPrefab.destroy() }, this );
     }
 
-    selectGameMode( event:Event , customEventData:string )
+    selectGameMode( event:Event , gameModeIndex:string )
     {
         if( isNaN( parseInt(this.livesInput.string) ) || parseInt(this.livesInput.string) == 0 )  
         {
-            // console.log( "Please enter the valid number " ) ;
-            return  ;
+            this.errorText = "Please enter the valid number " ;
+            this.generateErrorDialog(this.errorText) ;
+            return ; ;
         }
         
-        // console.log( "select game mode ", customEventData ) ;
-        Singleton.getInstance().gameMode = parseInt(customEventData) ;
-        const userData = getUserData();
-        const username = Object.keys(userData)[0]; 
-        if (username && getUserLoginStatus(username)) 
+        // console.log( "select gamemodeIndex ", parseInt(gameModeIndex)-1 ) ;
+        Singleton.getInstance().gameMode = parseInt(gameModeIndex)-1 ;
+        // console.log( "select gamemodeIndex ", Singleton.getInstance().gameMode ) ;
+        
+        if( ! this.userData[this.usernameInput.string] ) updateScore( this.usernameInput.string , parseInt(gameModeIndex)-1 , 0 , 0 ) ;
+        else
         {
-            console.log( " old data " ) ;
-            const oldData = userData[username];
-            userData[this.usernameInput.string] = oldData ;
-            delete userData[username];
-            localStorage.removeItem(username);
-            setUserData(userData);
+            const gameData = this.userData[this.usernameInput.string].gameData;
+            if( ! gameData[parseInt(gameModeIndex)-1] ) updateScore( this.usernameInput.string , parseInt(gameModeIndex)-1 , 0 , 0 ) ;
         }
-        if( ! userData[this.usernameInput.string] ) updateScore( this.usernameInput.string , parseInt(customEventData)-1 , 0 , 0 )
-        Singleton.getInstance().usernameLogin  = true ;
-        setUserLoginStatus(this.usernameInput.string  , true ) ;
         director.loadScene(levelSelectionScene)
     } 
 
@@ -127,4 +132,27 @@ export class gameModeSelection extends Component {
         
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

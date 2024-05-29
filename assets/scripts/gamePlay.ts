@@ -3,7 +3,7 @@ import { gamePlayScene , levelSelectionScene , letstartGameFontSize , countdownL
 import { Singleton } from './gameManager/singleton';
 import { brickPatternDesigns } from './brickPatterns/bricksPatterns';
 import { switchButton } from './Utility';
-import { setUserData , getUserData , updateScore , getUserGameData , setUserLoginStatus , getUserLoginStatus } from './ScoreManagerLocalStorage' ;
+import { setUserData , getUserData , updateScore } from './ScoreManagerLocalStorage' ;
 
 
 const { ccclass, property } = _decorator;
@@ -79,6 +79,9 @@ export class gamePlay extends Component {
 
     private rows : number ;
     private columns : number ;
+    private brickNodeMap: Map<Node, {i: number, j: number} > = new Map();
+    private userData : any ; 
+
     private isBrickAnimating : boolean = true ;
     private ballInitialPosition : Vec3 = new Vec3(0,0,0) ;
     private platformInitialPosition : Vec3 = new Vec3(0,0,0) ;
@@ -88,7 +91,7 @@ export class gamePlay extends Component {
     private clickedLevel : number = 0 ;
     private gameMode : number = 1  ;
     private totalBricks :number = 0 ; 
-    private totalLives : number = 3 ;
+    private totalLives : number = 8 ;
     private allColors = [
         { name: "Red", color: new Color(255, 0, 0) },
         { name: "Green", color: new Color(0, 255, 0) },
@@ -100,8 +103,8 @@ export class gamePlay extends Component {
     private nextGame : string ;
     private startFirstTime : number = 1 ;
     private startGameAnimationFlag : number = 1 ;
-    private newBrickPatter : { brickColor: Color; breakFreq: number }[][] = [];
-    
+    // private newBrickPatternJSONData : { brickColor: Color; breakFreq: number }[][] = [];
+    private newBrickPatternJSONData: any[][] = [];
 
 
     startGameButton()
@@ -177,12 +180,20 @@ export class gamePlay extends Component {
         this.pause_icon.active = false ;
         this.settingsButtom()  ;
         this.bgMusic.play() ;
-        if( Singleton.getInstance().username )  this.usernameID.string = Singleton.getInstance().username ;
-        if( Singleton.getInstance().gameMode ) this.gameMode = Singleton.getInstance().gameMode ;
-        if( Singleton.getInstance().totalLives ) this.totalLives = Singleton.getInstance().totalLives ;
-        if( Singleton.getInstance().clickLevel ) this.clickedLevel = Singleton.getInstance().clickLevel ;
-        if( Singleton.getInstance().totalLevel  ) this.totalLevels = Singleton.getInstance().totalLevel  ;
-        // console.log( "game mode  " , this.gameMode , "total lives " , this.totalLives ) ;
+
+        this.userData = getUserData();
+        const username = Object.keys(this.userData)[0]; 
+        if ( !username ) return ;
+        this.usernameID.string = username  ;
+        // if( Singleton.getInstance().gameMode ) this.gameMode = Singleton.getInstance().gameMode ;
+        // if( Singleton.getInstance().totalLives ) this.totalLives = Singleton.getInstance().totalLives ;
+        // if( Singleton.getInstance().clickLevel ) this.clickedLevel = Singleton.getInstance().clickLevel ;
+        // if( Singleton.getInstance().totalLevel  ) this.totalLevels = Singleton.getInstance().totalLevel  ;
+        this.gameMode = Singleton.getInstance().gameMode ;
+        this.totalLives = Singleton.getInstance().totalLives ;
+        this.clickedLevel = Singleton.getInstance().clickLevel ;
+        this.totalLevels = Singleton.getInstance().totalLevel  ;
+        console.log( "game mode  " , this.gameMode , "clickLevel " , this.clickedLevel ) ;
         for(let i=0; i<this.totalLives; i++)
         {
             this.extraBalls.addChild(instantiate(this.extraBallsPrefab)) ;
@@ -297,43 +308,42 @@ export class gamePlay extends Component {
     {
         console.log( "brickPatterDataJSON => " , this.brickPatterDataJSON.json )
        
-        this.rows = this.brickPatterDataJSON.json.length -5;
-        this.columns = this.brickPatterDataJSON.json[0].length -5;
-
-        for (let i = 0; i < this.rows; i++) 
-        {
-            this.newBrickPatter[i] = [] ;
-            for (let j = 0; j < this.columns ; j++) 
-            {
-                this.newBrickPatter[i][j] = this.brickPatterDataJSON.json[i][j] ;            
-            }
-        }
-        
+        this.rows = this.brickPatterDataJSON.json.length  ;
+        this.columns = this.brickPatterDataJSON.json[0].length  ;
         console.log( "okokokok " ) ;
         for (let i = 0; i < this.rows; i++) 
         {
+            this.newBrickPatternJSONData[i] = [];
+            for (let j = 0; j < this.columns; j++) 
+            {
+                this.newBrickPatternJSONData[i][j] = { ...this.brickPatterDataJSON.json[i][j] };
+            }
+        }
+        for (let i = 0; i < this.rows; i++) 
+        {
             let brickHeight = 0 ;
-            let spacing = 2 ;
+            let spacing = 1 ;
             let brickRow = instantiate(this.rowBrickPrefab);
             for (let j = 0; j < this.columns ; j++) 
             {
-                let freq = this.newBrickPatter[i][j].breakFreq ;
+                let freq = this.newBrickPatternJSONData[i][j].breakFreq ;
                 if( freq == 0 ) continue ;
-                console.log( i , j , freq ) ;
-                let BrickColor = this.newBrickPatter[i][j].brickColor ; 
-                this.totalBricks++ ;
+                if( freq > 0 ) this.totalBricks++ ;
+                // console.log( i , j , freq ) ;
+                let BrickColor = this.newBrickPatternJSONData[i][j].brickColor ; 
                 let brick = instantiate(this.singleBrickPrefab);
                 let brickWidth = brick.getComponent(UITransform).width ;
                 brickHeight = brick.getComponent(UITransform).height ;   
-                let brickPosition = new Vec3( j * brickWidth - brickWidth*this.columns / 2 + spacing*j   , 0 , 0 )
+                // let brickPosition = new Vec3( j * brickWidth - brickWidth*(this.columns) / 2 + spacing*j  + brickWidth/2   , 0 , 0 )
+                let brickPosition = new Vec3( j * brickWidth - brickWidth*(this.columns-1) / 2 + spacing*j  , 0 , 0 )
                 brick.getComponent(Sprite).color = BrickColor;
                 brick.setPosition(brickPosition) ;
                 brickRow.addChild(brick);
                 brick.setScale( new Vec3(0 , 0 , 0) ) ;
+                this.brickNodeMap.set( brick , {i,j} ) ;
             }
             brickRow.setPosition( new Vec3( 0 , -(i * brickHeight - brickHeight*this.rows / 2 + spacing*i ), 0 ) )  ;
-            this.allBricks.addChild(brickRow);
-          
+            this.allBricks.addChild(brickRow) ;    
         }
 
         this.brickGenerateAnimation() ;
@@ -457,7 +467,7 @@ export class gamePlay extends Component {
     }
     onBeginContact(contact: any, selfCollider: any, otherCollider: any) 
     {
-        // console.log("on begin contact function");
+        // console.log("on begin contact function" , contact );
         const ballRigidbody = this.ballImage.getComponent(RigidBody2D);
 
         if (selfCollider.node === this.bottomWall) 
@@ -485,18 +495,24 @@ export class gamePlay extends Component {
         }
         else if (selfCollider.node.parent.parent === this.allBricks  )    
         {
-            let brickNodeIndex  = selfCollider.node.getSiblingIndex() ;
-            let parentIndex = selfCollider.node.parent.getSiblingIndex() ;
-            console.log( "index " , parentIndex , brickNodeIndex );
-            console.log( "freq1111ok " , this.newBrickPatter[brickNodeIndex][parentIndex].breakFreq );
-            this.newBrickPatter[brickNodeIndex][parentIndex].breakFreq -- ;
-            console.log( "freq2222ok " , this.newBrickPatter[brickNodeIndex][parentIndex].breakFreq );
-            if( this.newBrickPatter[brickNodeIndex][parentIndex].breakFreq == 0 )
+            let {i,j} = this.brickNodeMap.get(selfCollider.node) ;
+            this.newBrickPatternJSONData[i][j].breakFreq -- ;
+            // console.log( " frewq22ok " , this.newBrickPatternJSONData[i][j].breakFreq )
+            // for (let i = 0; i < this.rows; i++) 
+            // {
+                // for (let j = 0; j < this.columns ; j++) 
+                // {
+                //     let freq = this.newBrickPatternJSONData[9][j].breakFreq ;
+                //     if( freq == 0 ) continue ;
+                //     console.log( 9 , j , freq ) ;
+                // }
+            // }
+            if( this.newBrickPatternJSONData[i][j].breakFreq == 0 )
             {
-                if( this.gameMode == 1 ) this.normalSingleBrickRemovalMode1( selfCollider.node ) ;
-                else if( this.gameMode == 2 ) this.removeSameColorBallAndSingleBrickMode2(selfCollider.node , this.ballImage) ;
-                else if( this.gameMode == 3 ) this.removeBrickWholeRowMode3( selfCollider.node )
-                else if( this.gameMode == 4 ) this.removeSameColorBallAndWholeRowMode4( selfCollider.node , this.ballImage )
+                if( this.gameMode == 0 ) this.normalSingleBrickRemovalMode1( selfCollider.node ) ;
+                else if( this.gameMode == 1 ) this.removeSameColorBallAndSingleBrickMode2(selfCollider.node , this.ballImage) ;
+                else if( this.gameMode == 2 ) this.removeBrickWholeRowMode3( selfCollider.node )
+                else if( this.gameMode == 3 ) this.removeSameColorBallAndWholeRowMode4( selfCollider.node , this.ballImage )
             }
         }
     }
@@ -578,13 +594,11 @@ export class gamePlay extends Component {
 
     levelWinner()
     {
-        // console.log( " levelwinner  ======> " ) ;
-        // console.log( "gamemodeindex   " , this.gameMode , 'clicklevel  ' , this.clickedLevel , 'score  ' , this.score ) ;
-            
-
-        
-        updateScore(this.usernameID.string , this.gameMode-1 , this.clickedLevel, this.score);
-        Singleton.getInstance().setLevelScore( this.gameMode , this.clickedLevel, this.score);
+        console.log( " levelwinner  ======> " ) ;        
+        console.log( "leveWIn", this.usernameID.string , this.gameMode , this.clickedLevel, this.score ) ;        
+        console.log( "leveWIn", this.usernameID.string , this.gameMode , this.clickedLevel+1, 0 ) ;        
+        updateScore(this.usernameID.string , this.gameMode , this.clickedLevel, this.score);
+        // Singleton.getInstance().setLevelScore( this.gameMode , this.clickedLevel, this.score);
 
         const ballRigidbody = this.ballImage.getComponent(RigidBody2D);
         ballRigidbody.sleep() ;
@@ -597,7 +611,8 @@ export class gamePlay extends Component {
         // let gameModelevelWinner = Singleton.getInstance().getgameModeLevelWinner(this.gameMode) ;
         const userData = getUserData();
         const gameData = userData[this.usernameID.string ].gameData;
-        let gameModelevelWinner = gameData[this.gameMode-1].length ;
+        let gameModelevelWinner = gameData[this.gameMode].length ;
+        console.log( this.totalLevels  ,  gameData[this.gameMode].length  )
         let popUpLabelText = '' ;
         if( gameModelevelWinner == this.totalLevels )
         {

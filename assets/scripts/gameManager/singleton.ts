@@ -16,29 +16,6 @@ export class Singleton {
 
 
 
-  private _usernameLogin : boolean ;
-  public set usernameLogin ( val : boolean )
-  {
-    this._usernameLogin = val ;
-  }
-  public get usernameLogin()
-  {
-    return this._usernameLogin ;
-  }
-
-
-  private _username : string ;
-  public set username( val : string )
-  {
-    this._username = val ;
-  }
-  public get username()
-  {
-    return this._username ;
-  }
-
-  
-
 
   private _totalLives : number ;
   public set totalLives( val : number )
@@ -51,21 +28,6 @@ export class Singleton {
   }
 
 
-
-  // // // store how many levels player win in particular game mode
-  private _gameModeLevelWinner = new Array(10).fill(0);
-
-  public setgameModeLevelWinner(gameModeIndex : number ): void {
-      this._gameModeLevelWinner[gameModeIndex] ++ ;
-  }
-  
-  public getgameModeLevelWinner(gameModeIndex : number  ): number {
-      return this._gameModeLevelWinner[gameModeIndex] ;
-  }
-  
-
-
-  
 
   private _gameMode : number ;
   public set gameMode( val : number )
@@ -109,18 +71,56 @@ export class Singleton {
 
 
 
+  // private _usernameLogin : boolean ;
+  // public set usernameLogin ( val : boolean )
+  // {
+  //   this._usernameLogin = val ;
+  // }
+  // public get usernameLogin()
+  // {
+  //   return this._usernameLogin ;
+  // }
 
 
-  // // // score 2d array of gameModeIndex and clickedLevel
-  private _levelScore = new Array(10).fill(null).map(() => new Array(100).fill(0));
+  // private _username : string ;
+  // public set username( val : string )
+  // {
+  //   this._username = val ;
+  // }
+  // public get username()
+  // {
+  //   return this._username ;
+  // }
 
-  public setLevelScore(gameModeIndex : number , clickedLevel: number, score: number): void {
-      this._levelScore[gameModeIndex][clickedLevel] = score;
-  }
   
-  public getLevelScore(gameModeIndex : number , clickedLevel: number,): number {
-      return this._levelScore[gameModeIndex][clickedLevel];
-  }
+
+
+
+  // // // // store how many levels player win in particular game mode
+  // private _gameModeLevelWinner = new Array(10).fill(0);
+
+  // public setgameModeLevelWinner(gameModeIndex : number ): void {
+  //     this._gameModeLevelWinner[gameModeIndex] ++ ;
+  // }
+  
+  // public getgameModeLevelWinner(gameModeIndex : number  ): number {
+  //     return this._gameModeLevelWinner[gameModeIndex] ;
+  // }
+  
+
+
+
+
+  // // // // score 2d array of gameModeIndex and clickedLevel
+  // private _levelScore = new Array(10).fill(null).map(() => new Array(100).fill(0));
+
+  // public setLevelScore(gameModeIndex : number , clickedLevel: number, score: number): void {
+  //     this._levelScore[gameModeIndex][clickedLevel] = score;
+  // }
+  
+  // public getLevelScore(gameModeIndex : number , clickedLevel: number,): number {
+  //     return this._levelScore[gameModeIndex][clickedLevel];
+  // }
   
 
 
