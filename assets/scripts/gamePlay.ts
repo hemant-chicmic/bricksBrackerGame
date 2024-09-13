@@ -1,4 +1,4 @@
-import { _decorator, AudioSource, BoxCollider2D, Button, Collider2D, Color, Component, Contact2DType, director, EventMouse, instantiate, Intersection2D, JsonAsset, Label, Layout, loader, Node, PhysicsSystem2D, Prefab, randomRangeInt, resources, RigidBody2D, sp, Sprite, tween, Tween, UITransform, Vec2, Vec3 } from 'cc';
+import { _decorator, AudioSource, BoxCollider2D, Button, Collider2D, Color, Component, Contact2DType, director, error, EventMouse, instantiate, Intersection2D, JsonAsset, Label, Layout, loader, Node, PhysicsSystem2D, Prefab, randomRangeInt, resources, RigidBody2D, sp, Sprite, tween, Tween, UITransform, Vec2, Vec3 } from 'cc';
 import { gamePlayScene , levelSelectionScene , letstartGameFontSize , countdownLabelFontSize, gameModeSelectionScene , popUpLabel , playGameButton } from './constants' ;
 import { Singleton } from './gameManager/singleton';
 import { brickPatternDesigns } from './brickPatterns/bricksPatterns';
@@ -193,7 +193,7 @@ export class gamePlay extends Component {
         this.totalLives = Singleton.getInstance().totalLives ;
         this.clickedLevel = Singleton.getInstance().clickLevel ;
         this.totalLevels = Singleton.getInstance().totalLevel  ;
-        console.log( "game mode  " , this.gameMode , "clickLevel " , this.clickedLevel ) ;
+        // console.log( "game mode  " , this.gameMode , "clickLevel " , this.clickedLevel ) ;
         for(let i=0; i<this.totalLives; i++)
         {
             this.extraBalls.addChild(instantiate(this.extraBallsPrefab)) ;
@@ -306,11 +306,11 @@ export class gamePlay extends Component {
     
     generateBricksPattern()
     {
-        console.log( "brickPatterDataJSON => " , this.brickPatterDataJSON.json )
+        // console.log( "brickPatterDataJSON => " , this.brickPatterDataJSON.json )
        
         this.rows = this.brickPatterDataJSON.json.length  ;
         this.columns = this.brickPatterDataJSON.json[0].length  ;
-        console.log( "okokokok " ) ;
+        // console.log( "okokokok " ) ;
         for (let i = 0; i < this.rows; i++) 
         {
             this.newBrickPatternJSONData[i] = [];
@@ -420,7 +420,7 @@ export class gamePlay extends Component {
     }
     startGameTextAnimation()
     {
-        console.log( "lesstartgaem" ) ;
+        // console.log( "lesstartgaem" ) ;
         this.isBrickAnimating = true ;
         const label = this.letsStartGame.getComponent(Label);
         tween(this.letsStartGame)
@@ -497,7 +497,7 @@ export class gamePlay extends Component {
         {
             let {i,j} = this.brickNodeMap.get(selfCollider.node) ;
             this.newBrickPatternJSONData[i][j].breakFreq -- ;
-            // console.log( " frewq22ok " , this.newBrickPatternJSONData[i][j].breakFreq )
+            // console.log( " frewq22ok " , this.newBrickPatternJSONData[i][j].breakFreq ) ;
             // for (let i = 0; i < this.rows; i++) 
             // {
                 // for (let j = 0; j < this.columns ; j++) 
@@ -594,9 +594,9 @@ export class gamePlay extends Component {
 
     levelWinner()
     {
-        console.log( " levelwinner  ======> " ) ;        
-        console.log( "leveWIn", this.usernameID.string , this.gameMode , this.clickedLevel, this.score ) ;        
-        console.log( "leveWIn", this.usernameID.string , this.gameMode , this.clickedLevel+1, 0 ) ;        
+        // console.log( " levelwinner  ======> " ) ;        
+        // console.log( "leveWIn", this.usernameID.string , this.gameMode , this.clickedLevel, this.score ) ;        
+        // console.log( "leveWIn", this.usernameID.string , this.gameMode , this.clickedLevel+1, 0 ) ;        
         updateScore(this.usernameID.string , this.gameMode , this.clickedLevel, this.score);
         // Singleton.getInstance().setLevelScore( this.gameMode , this.clickedLevel, this.score);
 
@@ -612,7 +612,7 @@ export class gamePlay extends Component {
         const userData = getUserData();
         const gameData = userData[this.usernameID.string ].gameData;
         let gameModelevelWinner = gameData[this.gameMode].length ;
-        console.log( this.totalLevels  ,  gameData[this.gameMode].length  )
+        // console.log( this.totalLevels  ,  gameData[this.gameMode].length  )
         let popUpLabelText = '' ;
         if( gameModelevelWinner == this.totalLevels )
         {

@@ -51,7 +51,7 @@
       "brickColor": {
         "_val": 4278255360
       },
-      "breakFreq": -1
+      "breakFreq": 1
     },
     {
       "breakFreq": 0
@@ -104,7 +104,7 @@
       "brickColor": {
         "_val": 4278232575
       },
-      "breakFreq": -1
+      "breakFreq": 1
     },
     {
       "breakFreq": 0
@@ -121,7 +121,7 @@
       "brickColor": {
         "_val": 4278190335
       },
-      "breakFreq": -1
+      "breakFreq": 1
     },
     {
       "breakFreq": 0
@@ -139,7 +139,7 @@
       "brickColor": {
         "_val": 4278255615
       },
-      "breakFreq": -1
+      "breakFreq": 1
     },
     {
       "breakFreq": 0
